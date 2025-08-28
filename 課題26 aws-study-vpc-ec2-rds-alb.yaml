@@ -1,58 +1,24 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: CloudFormationでEC2を立ち上げRDS、ALBを追加
+Description: vpc-ec2-rds-alb
 
 Parameters:
-  MyIP:
-    Type: String
-    Default: 61.127.159.128/32
-    Description: "自分のPCからSSH接続できるIPアドレス"
-  KeyName:
-    Type: AWS::EC2::KeyPair::KeyName
-    Description: "EC2インスタンスに使用する既存のキーペア名"
-  AmiId:
-    Type: AWS::EC2::Image::Id
-    Default: ami-025bbcfb04b076789
-    Description: "EC2インスタンスに使用するAMI ID"
   NamePrefix:
     Type: String
     Default: aws-study
     Description: "リソース名の接頭辞（プレフィックス）"
-  EC2InstanceType:
+
+  MyIP:
     Type: String
-    Default: t3.micro
-    Description: "EC2インスタンスタイプ"
-  DBName:
-    Type: String
-    Default: mydatabase
-    Description: "RDSに作成するデータベース名"
-  DBUser:
-    Type: String
-    Default: root
-    MinLength: 1
-    MaxLength: 16
-    AllowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
-    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
-    Description: "RDSの管理者ユーザー名"
-  DBPassword:
-    Type: String
-    NoEcho: true
-    MinLength: 8
-    MaxLength: 41
-    AllowedPattern: "[a-zA-Z0-9]*"
-    ConstraintDescription: must contain only alphanumeric characters.
-    Description: "RDSの管理者パスワード"
-  DBAllocatedStorage:
-    Type: Number
-    Default: 20
-    Description: "RDSのストレージ容量（GB）"
-  DBInstanceClass:
-    Type: String
-    Default: db.t4g.micro
-    Description: "RDSのインスタンスタイプ"
+    Default: 61.127.159.128/32
+    Description: "自分のPCからSSH接続できるIPアドレス"
+
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: "EC2インスタンスに使用するキーペア名"
 
 Resources:
   # VPC作成
-  MyVPC:
+  VPC:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: 10.0.0.0/16
@@ -63,48 +29,48 @@ Resources:
           Value: !Sub "${NamePrefix}-vpc"
 
   # パブリックサブネット
-  PublicSubnetA:
+  PublicSubnetAZ1a:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref MyVPC
+      VpcId: !Ref VPC
       CidrBlock: 10.0.1.0/24
       AvailabilityZone: ap-northeast-1a
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Sub "${NamePrefix}-subnet-public1-ap-northeast-1a"
+          Value: !Sub "${NamePrefix}-subnet-public1a"
 
-  PublicSubnetC:
+  PublicSubnetAZ1c:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref MyVPC
+      VpcId: !Ref VPC
       CidrBlock: 10.0.3.0/24
       AvailabilityZone: ap-northeast-1c
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Sub "${NamePrefix}-subnet-public2-ap-northeast-1c"
+          Value: !Sub "${NamePrefix}-subnet-public1c"
 
   # プライベートサブネット
-  PrivateSubnetA:
+  PrivateSubnetAZ1a:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref MyVPC
+      VpcId: !Ref VPC
       CidrBlock: 10.0.2.0/24
       AvailabilityZone: ap-northeast-1a
       Tags:
         - Key: Name
-          Value: !Sub "${NamePrefix}-subnet-private1-ap-northeast-1a"
+          Value: !Sub "${NamePrefix}-subnet-private1a"
 
-  PrivateSubnetC:
+  PrivateSubnetAZ1c:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref MyVPC
+      VpcId: !Ref VPC
       CidrBlock: 10.0.4.0/24
       AvailabilityZone: ap-northeast-1c
       Tags:
         - Key: Name
-          Value: !Sub "${NamePrefix}-subnet-private2-ap-northeast-1c"
+          Value: !Sub "${NamePrefix}-subnet-private1c"
 
   # インターネットゲートウェイ
   InternetGateway:
@@ -117,14 +83,14 @@ Resources:
   AttachIGW:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
-      VpcId: !Ref MyVPC
+      VpcId: !Ref VPC
       InternetGatewayId: !Ref InternetGateway
 
   # ルートテーブル（パブリック）
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref MyVPC
+      VpcId: !Ref VPC
       Tags:
         - Key: Name
           Value: !Sub "${NamePrefix}-rtb-public"
@@ -137,45 +103,46 @@ Resources:
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref InternetGateway
 
-  PublicSubnetARouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId: !Ref PublicSubnetA
-      RouteTableId: !Ref PublicRouteTable
-
-  PublicSubnetCRouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId: !Ref PublicSubnetC
-      RouteTableId: !Ref PublicRouteTable
-
   # ルートテーブル（プライベート）
   PrivateRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref MyVPC
+      VpcId: !Ref VPC
       Tags:
         - Key: Name
           Value: !Sub "${NamePrefix}-rtb-private"
 
-  PrivateSubnetARouteTableAssociation:
+  # サブネットとルートテーブルの関連付け
+  PublicSubnetAZ1aAssoc:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref PrivateSubnetA
-      RouteTableId: !Ref PrivateRouteTable
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnetAZ1a
 
-  PrivateSubnetCRouteTableAssociation:
+  PublicSubnetAZ1cAssoc:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref PrivateSubnetC
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnetAZ1c
+
+  PrivateSubnetAZ1aAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
       RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnetAZ1a
+
+  PrivateSubnetAZ1cAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnetAZ1c
 
   # セキュリティグループ（ALB用）
-  MyALBSecurityGroup:
+  SecurityGroupALB:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: "ALB HTTP access"
-      VpcId: !Ref MyVPC
+      VpcId: !Ref VPC
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
@@ -186,11 +153,11 @@ Resources:
           Value: !Sub "${NamePrefix}-alb-sg"
 
   # セキュリティグループ（EC2用）
-  MySecurityGroup:
+  SecurityGroupEC2:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: "EC2 SSH & HTTP from ALB"
-      VpcId: !Ref MyVPC
+      VpcId: !Ref VPC
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 22
@@ -199,87 +166,87 @@ Resources:
         - IpProtocol: tcp
           FromPort: 8080
           ToPort: 8080
-          SourceSecurityGroupId: !Ref MyALBSecurityGroup
+          SourceSecurityGroupId: !Ref SecurityGroupALB
       Tags:
         - Key: Name
           Value: !Sub "${NamePrefix}-ec2-sg"
 
   # セキュリティグループ（RDS用）
-  MyDBSecurityGroup:
+  SecurityGroupRDS:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: "RDS MySQL from EC2"
-      VpcId: !Ref MyVPC
+      VpcId: !Ref VPC
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 3306
           ToPort: 3306
-          SourceSecurityGroupId: !Ref MySecurityGroup
+          SourceSecurityGroupId: !Ref SecurityGroupEC2
       Tags:
         - Key: Name
           Value: !Sub "${NamePrefix}-rds-sg"
 
   # EC2インスタンス
-  MyEC2Instance:
+  EC2:
     Type: AWS::EC2::Instance
     Properties:
-      InstanceType: !Ref EC2InstanceType
-      ImageId: !Ref AmiId
+      ImageId: !Sub "{{resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64}}"
+      InstanceType: t3.micro
       KeyName: !Ref KeyName
-      SubnetId: !Ref PublicSubnetA
+      SubnetId: !Ref PublicSubnetAZ1a
       SecurityGroupIds:
-        - !Ref MySecurityGroup
+        - !Ref SecurityGroupEC2
       Tags:
         - Key: Name
           Value: !Sub "${NamePrefix}-ec2"
 
+  # RDSインスタンス
+  RDS:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: !Sub "${NamePrefix}-rds"
+      DBName: awsstudy
+      Engine: mysql
+      EngineVersion: "8.0.42"
+      DBInstanceClass: db.t4g.micro
+      AllocatedStorage: 20
+      StorageType: gp3
+      MasterUsername: root
+      MasterUserPassword: aiaio009KeRu
+      PubliclyAccessible: false
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      BackupRetentionPeriod: 7
+      MultiAZ: false
+      AllowMajorVersionUpgrade: false
+      AutoMinorVersionUpgrade: true
+      VPCSecurityGroups:
+        - !Ref SecurityGroupRDS
+      Tags:
+        - Key: Name
+          Value: !Sub "${NamePrefix}-rds"
+
   # RDS用サブネットグループ
-  MyDBSubnetGroup:
+  DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
       DBSubnetGroupDescription: "RDS Private Subnet Group"
       SubnetIds:
-        - !Ref PrivateSubnetA
-        - !Ref PrivateSubnetC
+        - !Ref PrivateSubnetAZ1a
+        - !Ref PrivateSubnetAZ1c
       Tags:
         - Key: Name
           Value: !Sub "${NamePrefix}-rds-subnet-group"
 
-  # RDSインスタンス
-  MyDBInstance:
-    Type: AWS::RDS::DBInstance
-    DeletionPolicy: Snapshot
-    UpdateReplacePolicy: Snapshot
-    Properties:
-      DBInstanceIdentifier: !Sub "${NamePrefix}-rds"
-      DBName: !Ref DBName
-      Engine: mysql
-      EngineVersion: "8.0.39"
-      MasterUsername: !Ref DBUser
-      MasterUserPassword: !Ref DBPassword
-      AllocatedStorage: !Ref DBAllocatedStorage
-      DBInstanceClass: !Ref DBInstanceClass
-      VPCSecurityGroups:
-        - !Ref MyDBSecurityGroup
-      DBSubnetGroupName: !Ref MyDBSubnetGroup
-      BackupRetentionPeriod: 7
-      PubliclyAccessible: false
-      DeletionProtection: false
-      MultiAZ: false
-      StorageType: gp3
-      Tags:
-        - Key: Name
-          Value: !Sub "${NamePrefix}-rds"
   # ALB
-  MyALB:
+  ALB:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Name: !Sub "${NamePrefix}-alb"
       Subnets:
-        - !Ref PublicSubnetA
-        - !Ref PublicSubnetC
+        - !Ref PublicSubnetAZ1a
+        - !Ref PublicSubnetAZ1c
       SecurityGroups:
-        - !Ref MyALBSecurityGroup
+        - !Ref SecurityGroupALB
       Scheme: internet-facing
       Type: application
       IpAddressType: ipv4
@@ -287,28 +254,32 @@ Resources:
         - Key: Name
           Value: !Sub "${NamePrefix}-alb"
 
-  MyTargetGroup:
+  TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Name: !Sub "${NamePrefix}-tg"
-      VpcId: !Ref MyVPC
+      VpcId: !Ref VPC
       Protocol: HTTP
       Port: 8080
       TargetType: instance
       Targets:
-      - Id: !Ref MyEC2Instance
+      - Id: !Ref EC2
       HealthCheckProtocol: HTTP
       HealthCheckPort: "8080"
       HealthCheckPath: "/"
+      HealthCheckIntervalSeconds: 15
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2
       Matcher:
         HttpCode: 200
 
-  MyListener:
+  Listener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
-      LoadBalancerArn: !Ref MyALB
+      LoadBalancerArn: !Ref ALB
       Port: 80
       Protocol: HTTP
       DefaultActions:
         - Type: forward
-          TargetGroupArn: !Ref MyTargetGroup
+          TargetGroupArn: !Ref TargetGroup
