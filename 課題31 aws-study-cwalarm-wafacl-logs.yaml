@@ -311,8 +311,8 @@ Resources:
       ComparisonOperator: GreaterThanThreshold
       TreatMissingData: notBreaching
       Tags:
-      - Key: Name
-        Value: !Sub "${NamePrefix}-ec2cpu-alarm"
+        - Key: Name
+          Value: !Sub "${NamePrefix}-ec2cpu-alarm"
 
   # WAF WebACL
   WebACL:
@@ -341,8 +341,8 @@ Resources:
             CloudWatchMetricsEnabled: true
             MetricName: !Sub "${NamePrefix}-core-rules"
       Tags:
-      - Key: Name
-        Value: !Sub "${NamePrefix}-waf"
+        - Key: Name
+          Value: !Sub "${NamePrefix}-waf"
 
   # WAF WebACLをALBに関連付け
   WebACLAssociation:
