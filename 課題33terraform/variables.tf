@@ -12,6 +12,19 @@ variable "name_prefix" {
   default     = "tf-aws-study"
 }
 
+# Amazon Linux 2023のAMIのID
+variable "ami_id" {
+  description = "Amazon Linux 2023のAMIのID"
+  type        = string
+  default     = "ami-07faa35bbd2230d90"
+}
+
+# EC2用キーペア名
+variable "key_name" {
+  description = "EC2用キーペア名"
+  type        = string
+}
+
 # RDSのパスワード
 variable "rds_password" {
   description = "RDSのパスワード"

@@ -1,14 +1,3 @@
-# S3バケット関連の出力
-output "s3bucket_id" {
-  description = "S3バケットのID"
-  value       = module.s3_bucket.bucket_id
-}
-
-output "s3bucket_name" {
-  description = "S3バケットの名前"
-  value       = module.s3_bucket.bucket_name
-}
-
 # VPC関連の出力
 output "vpc_id" {
   description = "VPCのID"

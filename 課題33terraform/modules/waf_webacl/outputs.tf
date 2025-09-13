@@ -10,14 +10,14 @@ output "waf_name" {
   value       = aws_wafv2_web_acl.wafwebacl.name
 }
 
+# CloudWatch LogsグループのID
+output "log_group_id" {
+  description = "CloudWatch LogsグループのID"
+  value       = aws_cloudwatch_log_group.cwlogs.id
+}
+
 # CloudWatch Logsグループの名前
 output "log_group_name" {
   description = "CloudWatch Logsグループの名前"
   value       = aws_cloudwatch_log_group.cwlogs.name
-}
-
-# CloudWatch LogsグループのID
-output "log_group_id" {
-  description = "CloudWatch LogsグループのID"
-  value       = aws_cloudwatch_log_group.cwlogs
 }

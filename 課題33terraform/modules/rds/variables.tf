@@ -94,20 +94,6 @@ variable "auto_minor_version_upgrade" {
   default     = true
 }
 
-# 削除時に最終スナップショットを作るか
-variable "skip_final_snapshot" {
-  description = "削除時に最終スナップショットを作るか"
-  type        = bool
-  default     = true
-}
-
-# 自動バックアップ削除を有効にするか
-variable "delete_automated_backups" {
-  description = "自動バックアップ削除を有効にするか"
-  type        = bool
-  default     = true
-}
-
 # VPCのID
 variable "vpc_id" {
   description = "VPCのID"

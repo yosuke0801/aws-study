@@ -5,7 +5,7 @@ variable "ec2_name" {
 }
 
 # EC2のAMIのID
-variable "ami" {
+variable "ami_id" {
   description = "EC2のAMIのID"
   type        = string
 }

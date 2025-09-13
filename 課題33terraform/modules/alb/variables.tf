@@ -11,12 +11,6 @@ variable "internal" {
   default     = false
 }
 
-# "ALBにアタッチするセキュリティグループ"
-variable "security_groups" {
-  description = "ALBにアタッチするセキュリティグループ"
-  type        = list(string)
-}
-
 # ALBを配置するサブネットのリスト
 variable "subnets" {
   description = "ALBを配置するサブネットのリスト"

@@ -5,7 +5,7 @@ resource "aws_lb" "alb" {
   internal           = var.internal
   ip_address_type    = "ipv4"
   subnets            = var.subnets
-  security_groups    = var.security_groups
+  security_groups    = [aws_security_group.alb_sg.id]
   tags               = var.tags
 }
 
