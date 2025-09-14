@@ -29,7 +29,7 @@ variable "key_name" {
 variable "allowed_ssh_cidr" {
   description = "SSHアクセスを許可するIP"
   type        = string
-  default     = "" # デフォルトは空文字
+  default     = "127.0.0.1/32" # ← 学習用ダミー値
 }
 
 # RDSのパスワード
