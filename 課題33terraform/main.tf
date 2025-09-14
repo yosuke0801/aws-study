@@ -11,14 +11,14 @@ module "vpc" {
 
 # EC2
 module "ec2_instance" {
-  source        = "./modules/ec2"
-  ec2_name      = "${var.name_prefix}-ec2"
-  ami_id        = var.ami_id
-  instance_type = "t3.micro"
-  key_name      = var.key_name
-  subnet_id     = module.vpc.public_subnet_ids[0]
-  vpc_id        = module.vpc.vpc_id
-
+  source           = "./modules/ec2"
+  ec2_name         = "${var.name_prefix}-ec2"
+  ami_id           = var.ami_id
+  instance_type    = "t3.micro"
+  key_name         = var.key_name
+  allowed_ssh_cidr = var.allowed_ssh_cidr
+  subnet_id        = module.vpc.public_subnet_ids[0]
+  vpc_id           = module.vpc.vpc_id
   tags = {
     Name = "${var.name_prefix}-ec2"
   }

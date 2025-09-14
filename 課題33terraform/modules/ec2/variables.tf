@@ -34,6 +34,19 @@ variable "vpc_id" {
   type        = string
 }
 
+# SSHアクセスを許可するIPアドレス
+# 複数IPを許可したい場合はカンマ区切りではなく、別の方法で管理
+variable "allowed_ssh_cidr" {
+  description = "SSHアクセスを許可するIP"
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = length(var.allowed_ssh_cidr) > 0
+    error_message = "allowed_ssh_cidr は空にできません。必ずCIDRを指定してください。"
+  }
+}
+
 # 共通タグ
 variable "tags" {
   description = "EC2や関連リソースの共通タグ"

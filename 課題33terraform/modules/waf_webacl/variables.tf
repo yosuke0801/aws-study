@@ -4,9 +4,9 @@ variable "waf_name" {
   type        = string
 }
 
-# 関連付けるALBのID
+# 関連付けるALBのARN
 variable "alb_arn" {
-  description = "関連付けるALBのID"
+  description = "関連付けるALBのARN"
   type        = string
 }
 

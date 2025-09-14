@@ -25,6 +25,13 @@ variable "key_name" {
   type        = string
 }
 
+# SSHアクセスを許可するIP
+variable "allowed_ssh_cidr" {
+  description = "SSHアクセスを許可するIP"
+  type        = string
+  default     = "" # デフォルトは空文字
+}
+
 # RDSのパスワード
 variable "rds_password" {
   description = "RDSのパスワード"

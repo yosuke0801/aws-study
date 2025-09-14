@@ -4,7 +4,7 @@ output "alb_id" {
   value       = aws_lb.alb.id
 }
 
-# ALBのARM
+# ALBのARN
 output "alb_arn" {
   description = "ALBのARN"
   value       = aws_lb.alb.arn
