@@ -94,6 +94,20 @@ variable "auto_minor_version_upgrade" {
   default     = true
 }
 
+# 削除保護を有効にするか
+variable "deletion_protection" {
+  description = "削除保護を有効にするかどうか"
+  type        = bool
+  default     = true
+}
+
+# 削除時にスナップショットをスキップするか
+variable "skip_final_snapshot" {
+  description = "削除時にスナップショットをスキップするかどうか"
+  type        = bool
+  default     = false
+}
+
 # VPCのID
 variable "vpc_id" {
   description = "VPCのID"

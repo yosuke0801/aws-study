@@ -14,6 +14,8 @@ resource "aws_db_instance" "rds" {
   storage_type                = var.storage_type
   allow_major_version_upgrade = var.allow_major_version_upgrade
   auto_minor_version_upgrade  = var.auto_minor_version_upgrade
+  deletion_protection         = var.deletion_protection
+  skip_final_snapshot         = var.skip_final_snapshot
   db_subnet_group_name        = aws_db_subnet_group.rds_subnet_group.name
   vpc_security_group_ids      = [aws_security_group.rds_sg.id]
   tags                        = var.tags
