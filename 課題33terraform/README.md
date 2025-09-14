@@ -1,6 +1,6 @@
-事前にS3バケット「tf-aws-study-terraform-tfstate」とDynamoDBテーブル「terraform-lock」を作成してください。
+実行前に必ずterraform.tfvarsのallowed_ssh_cidrを自分の固定IPに変更してください。
 
-実行前にterraform.tfvarsのallowed_ssh_cidrを自分の固定IPに変更してください。
+事前にS3バケット「tf-aws-study-terraform-tfstate」とDynamoDBテーブル「terraform-lock」を作成してください。
 
 このテンプレートは学習用でありRDSパスワードを変数「rds_password」で管理しています。
 本番運用ではRDSパスワードは「AWS Secrets Manager」または「SSM Parameter Store」に保管してください。

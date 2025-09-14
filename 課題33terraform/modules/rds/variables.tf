@@ -108,6 +108,13 @@ variable "skip_final_snapshot" {
   default     = false
 }
 
+# RDS削除時に作成するスナップショットの名前
+variable "final_snapshot_identifier" {
+  description = "RDS削除時に作成するスナップショットの名前"
+  type        = string
+  default     = null
+}
+
 # VPCのID
 variable "vpc_id" {
   description = "VPCのID"
@@ -132,3 +139,4 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+

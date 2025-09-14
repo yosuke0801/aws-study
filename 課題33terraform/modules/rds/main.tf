@@ -1,3 +1,8 @@
+# 追加：ユニークなIDを生成するリソース
+resource "random_id" "final_snapshot" {
+  byte_length = 4
+}
+
 # RDS
 resource "aws_db_instance" "rds" {
   identifier                  = var.rds_name
@@ -16,6 +21,7 @@ resource "aws_db_instance" "rds" {
   auto_minor_version_upgrade  = var.auto_minor_version_upgrade
   deletion_protection         = var.deletion_protection
   skip_final_snapshot         = var.skip_final_snapshot
+  final_snapshot_identifier   = var.final_snapshot_identifier
   db_subnet_group_name        = aws_db_subnet_group.rds_subnet_group.name
   vpc_security_group_ids      = [aws_security_group.rds_sg.id]
   tags                        = var.tags

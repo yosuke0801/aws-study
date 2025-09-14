@@ -44,12 +44,6 @@ variable "health_check_path" {
   default     = "/"
 }
 
-# ALBに紐づけるEC2のID
-variable "ec2_instance_id" {
-  description = "ALBに紐づけるEC2のID"
-  type        = string
-}
-
 # 共通タグ
 variable "tags" {
   description = "タグ"

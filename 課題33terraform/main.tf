@@ -27,21 +27,22 @@ module "ec2_instance" {
 
 # RDS
 module "rds" {
-  source              = "./modules/rds"
-  rds_name            = "${var.name_prefix}-rds"
-  vpc_id              = module.vpc.vpc_id
-  private_subnet_ids  = module.vpc.private_subnet_ids
-  ec2_sg_id           = module.ec2_instance.ec2_sg_ids[0]
-  username            = "root"
-  rds_password        = var.rds_password
-  availability_zones  = ["ap-northeast-1a", "ap-northeast-1c"]
-  allocated_storage   = 20
-  db_name             = "tfawsstudyrds"
-  instance_class      = "db.t3.micro"
-  multi_az            = false
-  publicly_accessible = false
-  deletion_protection = true
-  skip_final_snapshot = false
+  source                    = "./modules/rds"
+  rds_name                  = "${var.name_prefix}-rds"
+  vpc_id                    = module.vpc.vpc_id
+  private_subnet_ids        = module.vpc.private_subnet_ids
+  ec2_sg_id                 = module.ec2_instance.ec2_sg_ids[0]
+  username                  = "root"
+  rds_password              = var.rds_password
+  availability_zones        = ["ap-northeast-1a", "ap-northeast-1c"]
+  allocated_storage         = 20
+  db_name                   = "tfawsstudyrds"
+  instance_class            = "db.t3.micro"
+  multi_az                  = false
+  publicly_accessible       = false
+  deletion_protection       = true
+  skip_final_snapshot       = false
+  final_snapshot_identifier = "mydb-final-snapshot"
   tags = {
     Name = "${var.name_prefix}-rds"
   }
@@ -57,10 +58,15 @@ module "alb" {
   target_port       = 8080
   listener_port     = 80
   health_check_path = "/"
-  ec2_instance_id   = module.ec2_instance.ec2_id
   tags = {
     Name = "${var.name_prefix}-alb"
   }
+}
+
+resource "aws_lb_target_group_attachment" "alb_tg_attachment" {
+  target_group_arn = module.alb.alb_tg_arn      # ALBモジュールの出力を参照
+  target_id        = module.ec2_instance.ec2_id # EC2モジュールの出力を参照
+  port             = 8080                       # EC2 のターゲットポート
 }
 
 # Cloudwatch Alarm
