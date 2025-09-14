@@ -39,8 +39,8 @@ module "rds" {
   instance_class      = "db.t3.micro"
   multi_az            = false
   publicly_accessible = false
-  deletion_protection = false
-  skip_final_snapshot = true
+  deletion_protection = true
+  skip_final_snapshot = false
   tags = {
     Name = "${var.name_prefix}-rds"
   }
