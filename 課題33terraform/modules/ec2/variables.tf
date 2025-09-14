@@ -47,6 +47,11 @@ variable "allowed_ssh_cidr" {
   }
 }
 
+variable "alb_sg_id" {
+  description = "Security Group ID of the ALB to allow access to EC2"
+  type        = string
+}
+
 # 共通タグ
 variable "tags" {
   description = "EC2や関連リソースの共通タグ"

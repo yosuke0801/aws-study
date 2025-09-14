@@ -19,6 +19,7 @@ module "ec2_instance" {
   allowed_ssh_cidr = var.allowed_ssh_cidr
   subnet_id        = module.vpc.public_subnet_ids[0]
   vpc_id           = module.vpc.vpc_id
+  alb_sg_id        = module.alb.alb_sg_id
   tags = {
     Name = "${var.name_prefix}-ec2"
   }

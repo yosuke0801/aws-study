@@ -19,7 +19,7 @@ resource "aws_security_group" "alb_sg" {
     from_port   = var.listener_port
     to_port     = var.listener_port
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.allowed_alb_cidr]
   }
 
   egress {

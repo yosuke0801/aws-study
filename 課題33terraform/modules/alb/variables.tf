@@ -56,3 +56,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "allowed_alb_cidr" {
+  description = "ALB にアクセスを許可する CIDR。デフォルトは 0.0.0.0/0"
+  type        = string
+  default     = "0.0.0.0/0" # デフォルトは全体公開
+}
