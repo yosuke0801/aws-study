@@ -21,12 +21,16 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
+        working-directory: 課題41terraform
 
       - name: Terraform Fmt
         run: terraform fmt -check
+        working-directory: 課題41terraform
 
       - name: Terraform Validate
         run: terraform validate
+        working-directory: 課題41terraform
 
       - name: Terraform Test (CI)
         run: terraform test terraform/tests -filter "test-ci"
+        working-directory: 課題41terraform
