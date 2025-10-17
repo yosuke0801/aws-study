@@ -26,10 +26,7 @@ jobs:
         working-directory: 課題41terraform
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve \
-          -var "key_name=${{ secrets.KEY_NAME }}" \
-          -var "rds_password=${{ secrets.RDS_PASSWORD }}" \
-          -var "allowed_ssh_cidr=${{ secrets.ALLOWED_SSH_CIDR }}"
+        run: terraform apply -auto-approve -var "key_name=${{ secrets.KEY_NAME }}" -var "rds_password=${{ secrets.RDS_PASSWORD }}" -var "allowed_ssh_cidr=${{ secrets.ALLOWED_SSH_CIDR }}"
         working-directory: 課題41terraform
 
       - name: Terraform Test (CD)
