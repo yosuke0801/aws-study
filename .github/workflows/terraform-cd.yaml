@@ -1,4 +1,4 @@
-name: Terraform Apply
+name: Terraform Test
 
 on:
   push:
@@ -11,7 +11,7 @@ env:
   AWS_REGION: ap-northeast-1
 
 jobs:
-  terraform_apply:
+  terraform_test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -25,6 +25,6 @@ jobs:
         run: terraform init
         working-directory: 課題41terraform
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve -var "key_name=${{ secrets.KEY_NAME }}" -var "rds_password=${{ secrets.RDS_PASSWORD }}" -var "allowed_ssh_cidr=${{ secrets.ALLOWED_SSH_CIDR }}"
+      - name: Terraform Test
+        run: terraform test terraform/tests -filter "test-cd" -var "key_name=${{ secrets.KEY_NAME }}" -var "rds_password=${{ secrets.RDS_PASSWORD }}" -var "allowed_ssh_cidr=${{ secrets.ALLOWED_SSH_CIDR }}"
         working-directory: 課題41terraform
