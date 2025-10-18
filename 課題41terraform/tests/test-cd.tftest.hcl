@@ -1,20 +1,5 @@
-# tests/test-ci.tftest.hcl
-
-# テストで使う変数をまとめる
-variables {
-  key_name          = var.key_name
-  rds_password      = var.rds_password
-  allowed_ssh_cidr  = var.allowed_ssh_cidr
-}
-
 run "alarm_basic_info" {
   command = plan
-
-  variables {
-    key_name          = var.key_name
-    rds_password      = var.rds_password
-    allowed_ssh_cidr  = var.allowed_ssh_cidr
-  }
 
   assert {
     condition     = module.cpu_alarm.cwa_name != null
@@ -29,12 +14,6 @@ run "alarm_basic_info" {
 
 run "alb_basic_info" {
   command = plan
-
-  variables {
-    key_name          = var.key_name
-    rds_password      = var.rds_password
-    allowed_ssh_cidr  = var.allowed_ssh_cidr
-  }
 
   assert {
     condition     = module.alb.alb_name != null
@@ -60,12 +39,6 @@ run "alb_basic_info" {
 run "ec2_basic_info" {
   command = plan
 
-  variables {
-    key_name          = var.key_name
-    rds_password      = var.rds_password
-    allowed_ssh_cidr  = var.allowed_ssh_cidr
-  }
-
   assert {
     condition     = module.ec2_instance.ec2_name == "tf-aws-study-ec2"
     error_message = "EC2名が期待値と一致しません"
@@ -85,12 +58,6 @@ run "ec2_basic_info" {
 run "rds_basic_info" {
   command = plan
 
-  variables {
-    key_name          = var.key_name
-    rds_password      = var.rds_password
-    allowed_ssh_cidr  = var.allowed_ssh_cidr
-  }
-
   assert {
     condition     = module.rds.rds_name == "tfawsstudyrds"
     error_message = "RDS名が期待値と一致しません"
@@ -107,14 +74,8 @@ run "rds_basic_info" {
   }
 }
 
-run "vpc_basic_info_ci" {
+run "vpc_basic_info_cd" {
   command = plan
-
-  variables {
-    key_name          = var.key_name
-    rds_password      = var.rds_password
-    allowed_ssh_cidr  = var.allowed_ssh_cidr
-  }
 
   assert {
     condition     = module.vpc.vpc_name == "tf-aws-study-vpc"
@@ -129,12 +90,6 @@ run "vpc_basic_info_ci" {
 
 run "waf_basic_info" {
   command = plan
-
-  variables {
-    key_name          = var.key_name
-    rds_password      = var.rds_password
-    allowed_ssh_cidr  = var.allowed_ssh_cidr
-  }
 
   assert {
     condition     = module.waf.waf_name != null
