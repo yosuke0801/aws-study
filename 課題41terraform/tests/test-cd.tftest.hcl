@@ -1,12 +1,19 @@
-# 課題41terraform/tests/test-cd.tftest.hcl
+# tests/test-ci.tftest.hcl
+
+# テストで使う変数をまとめる
+variables {
+  key_name          = var.key_name
+  rds_password      = var.rds_password
+  allowed_ssh_cidr  = var.allowed_ssh_cidr
+}
 
 run "alarm_basic_info" {
   command = plan
 
   variables {
-    key_name         = var.key_name
-    rds_password     = var.rds_password
-    allowed_ssh_cidr = var.allowed_ssh_cidr
+    key_name          = var.key_name
+    rds_password      = var.rds_password
+    allowed_ssh_cidr  = var.allowed_ssh_cidr
   }
 
   assert {
@@ -24,9 +31,9 @@ run "alb_basic_info" {
   command = plan
 
   variables {
-    key_name         = var.key_name
-    rds_password     = var.rds_password
-    allowed_ssh_cidr = var.allowed_ssh_cidr
+    key_name          = var.key_name
+    rds_password      = var.rds_password
+    allowed_ssh_cidr  = var.allowed_ssh_cidr
   }
 
   assert {
@@ -54,9 +61,9 @@ run "ec2_basic_info" {
   command = plan
 
   variables {
-    key_name         = var.key_name
-    rds_password     = var.rds_password
-    allowed_ssh_cidr = var.allowed_ssh_cidr
+    key_name          = var.key_name
+    rds_password      = var.rds_password
+    allowed_ssh_cidr  = var.allowed_ssh_cidr
   }
 
   assert {
@@ -79,9 +86,9 @@ run "rds_basic_info" {
   command = plan
 
   variables {
-    key_name         = var.key_name
-    rds_password     = var.rds_password
-    allowed_ssh_cidr = var.allowed_ssh_cidr
+    key_name          = var.key_name
+    rds_password      = var.rds_password
+    allowed_ssh_cidr  = var.allowed_ssh_cidr
   }
 
   assert {
@@ -100,13 +107,13 @@ run "rds_basic_info" {
   }
 }
 
-run "vpc_basic_info_cd" {
+run "vpc_basic_info_ci" {
   command = plan
 
   variables {
-    key_name         = var.key_name
-    rds_password     = var.rds_password
-    allowed_ssh_cidr = var.allowed_ssh_cidr
+    key_name          = var.key_name
+    rds_password      = var.rds_password
+    allowed_ssh_cidr  = var.allowed_ssh_cidr
   }
 
   assert {
@@ -124,9 +131,9 @@ run "waf_basic_info" {
   command = plan
 
   variables {
-    key_name         = var.key_name
-    rds_password     = var.rds_password
-    allowed_ssh_cidr = var.allowed_ssh_cidr
+    key_name          = var.key_name
+    rds_password      = var.rds_password
+    allowed_ssh_cidr  = var.allowed_ssh_cidr
   }
 
   assert {
