@@ -16,7 +16,7 @@ output "public_subnet1a_name" {
 
 output "public_subnet_id" {
   description = "パブリックサブネットのID"
-  value = module.vpc.public_subnet1a_id
+  value       = module.vpc.public_subnet1a_id
 }
 
 # EC2関連の出力
