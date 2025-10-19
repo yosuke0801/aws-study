@@ -24,7 +24,7 @@ jobs:
         working-directory: 課題41terraform
 
       - name: Terraform Fmt
-        run: terraform fmt -check
+        run: terraform fmt -recursive
         working-directory: 課題41terraform
 
       - name: Terraform Validate
