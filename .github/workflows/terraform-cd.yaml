@@ -1,0 +1,30 @@
+name: Terraform CD
+
+on:
+  push:
+    branches:
+      - main   # mainにマージされたときにトリガー
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: ap-northeast-1
+
+jobs:
+  terraform_apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.13.1
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: 課題41terraform
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        working-directory: 課題41terraform
