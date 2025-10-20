@@ -89,3 +89,17 @@ module "waf" {
     Name = "${var.name_prefix}-wafwebacl"
   }
 }
+
+module "ec2_test_2" {
+  source        = "./modules/ec2"
+  ec2_name      = "tf-test-ec2-2"
+  ami_id        = var.ami_id
+  instance_type = "t3.micro"
+  key_name      = "dummy"          # dummyでも作れる
+  alb_sg_id     = "dummy"          # dummyでも作れる
+  subnet_id     = module.vpc.public_subnet_ids[0]
+  vpc_id        = module.vpc.vpc_id
+  tags = {
+    Name = "tf-test-ec2-2"
+  }
+}
