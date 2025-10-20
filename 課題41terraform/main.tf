@@ -32,7 +32,7 @@ module "rds" {
   rds_name                  = "${var.name_prefix}-rds"
   vpc_id                    = module.vpc.vpc_id
   private_subnet_ids        = module.vpc.private_subnet_ids
-  ec2_sg_id                 = module.ec2_instance.ec2_sg_ids[0]
+  ec2_sg_id                 = module.ec2_instance[0].ec2_sg_ids[0]  # 1台目のEC2を参照
   username                  = "root"
   rds_password              = var.rds_password
   availability_zones        = ["ap-northeast-1a", "ap-northeast-1c"]
@@ -65,16 +65,16 @@ module "alb" {
 }
 
 resource "aws_lb_target_group_attachment" "alb_tg_attachment" {
-  target_group_arn = module.alb.alb_tg_arn      # ALBモジュールの出力を参照
-  target_id        = module.ec2_instance.ec2_id # EC2モジュールの出力を参照
-  port             = 8080                       # EC2 のターゲットポート
+  target_group_arn = module.alb.alb_tg_arn
+  target_id        = module.ec2_instance[0].ec2_id  # 1台目EC2を参照
+  port             = 8080
 }
 
 # Cloudwatch Alarm
 module "cpu_alarm" {
   source             = "./modules/cloudwatch_alarm"
   cwa_name           = "${var.name_prefix}-ec2cpu-alarm"
-  ec2_instance_id    = module.ec2_instance.ec2_id
+  ec2_instance_id    = module.ec2_instance[0].ec2_id  # 1台目EC2を参照
   threshold          = 5
   evaluation_periods = 1
   period             = 60
