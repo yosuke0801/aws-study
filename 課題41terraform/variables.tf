@@ -38,3 +38,9 @@ variable "rds_password" {
   type        = string
   sensitive   = true
 }
+
+variable "ec2_count" {
+  description = "作成するEC2インスタンスの台数"
+  type        = number
+  default     = 1
+}

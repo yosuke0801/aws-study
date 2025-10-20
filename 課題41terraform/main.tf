@@ -23,6 +23,7 @@ module "ec2_instance" {
   tags = {
     Name = "${var.name_prefix}-ec2"
   }
+  count = var.ec2_count
 }
 
 # RDS

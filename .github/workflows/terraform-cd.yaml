@@ -31,5 +31,6 @@ jobs:
         run: |
           terraform apply -auto-approve \
             -var "key_name=${{ secrets.KEY_NAME }}" \
-            -var "rds_password=${{ secrets.RDS_PASSWORD }}"
+            -var "rds_password=${{ secrets.RDS_PASSWORD }}" \
+            -var "ec2_count=2"
         working-directory: 課題41terraform
