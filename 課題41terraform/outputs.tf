@@ -39,25 +39,25 @@ output "igw_name" {
   value       = module.vpc.igw_name
 }
 
-# EC2関連の出力（複数対応）
+# EC2関連の出力
 output "ec2_id" {
   description = "EC2のID"
-  value       = [for m in module.ec2_instance : m.ec2_id]
+  value       = module.ec2_instance.ec2_id
 }
 
 output "ec2_name" {
   description = "EC2の名前"
-  value       = [for m in module.ec2_instance : m.ec2_name]
+  value       = module.ec2_instance.ec2_name
 }
 
 output "ec2_sg_ids" {
   description = "EC2セキュリティグループのID"
-  value       = flatten([for m in module.ec2_instance : m.ec2_sg_ids])
+  value       = module.ec2_instance.ec2_sg_ids
 }
 
 output "ec2_sg_names" {
   description = "EC2セキュリティグループの名前"
-  value       = [for m in module.ec2_instance : m.ec2_sg_names]
+  value       = module.ec2_instance.ec2_sg_names
 }
 
 # RDS関係の出力
@@ -102,7 +102,7 @@ output "alb_tg_name" {
   value       = module.alb.tg_name
 }
 
-# Cloudwatch Alarm関係の出力（1台目EC2参照）
+# Cloudwatch Alarm関係の出力
 output "cwa_ec2_cpu_alarm_id" {
   description = "Cloudwatch AlarmのID"
   value       = module.cpu_alarm.cwa_id
