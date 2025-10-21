@@ -8,9 +8,7 @@ on:
       - reopened
     branches: [main]
     paths:
-      - "**.tf"
-      - "**.tftest.hcl"
-      - ".github/workflows/*.yml"
+      - "課題41terraform/**"
 
 permissions:
   contents: read
