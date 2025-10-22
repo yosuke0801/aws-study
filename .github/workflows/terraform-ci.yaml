@@ -24,6 +24,8 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_DEFAULT_REGION: ap-northeast-1
+      TF_VAR_key_name: ${{ secrets.EC2_KEY_NAME }}
+      TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
 
     steps:
       - name: Checkout repository
@@ -44,9 +46,7 @@ jobs:
         run: terraform validate
 
       - name: Terraform Test
-        run: terraform test ./tests/test-ci.tftest.hcl \
-              -var="key_name=${{ secrets.EC2_KEY_NAME }}" \
-              -var="db_password=${{ secrets.DB_PASSWORD }}"
+        run: terraform test ./tests/test-ci.tftest.hcl
 
       - name: Terraform Plan
         run: terraform plan -input=false
