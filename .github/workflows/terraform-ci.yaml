@@ -44,7 +44,9 @@ jobs:
         run: terraform validate
 
       - name: Terraform Test
-        run: terraform test ./tests/test-ci.tftest.hcl
+        run: terraform test ./tests/test-ci.tftest.hcl \
+              -var="key_name=${{ secrets.EC2_KEY_NAME }}" \
+              -var="db_password=${{ secrets.DB_PASSWORD }}"
 
       - name: Terraform Plan
         run: terraform plan -input=false
