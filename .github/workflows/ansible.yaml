@@ -30,7 +30,7 @@ jobs:
       - name: Terraform Init
         run: |
           cd terraform
-          terraform init -backend=false
+          terraform init
 
       - name: Get EC2 Public IP from Terraform output
         run: |
