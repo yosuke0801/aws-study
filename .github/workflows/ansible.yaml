@@ -1,4 +1,4 @@
-name: Ansible Deploy Java 21
+name: Install Java on EC2
 
 on:
   workflow_dispatch:
@@ -6,11 +6,6 @@ on:
 jobs:
   ansible-run:
     runs-on: ubuntu-latest
-
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_DEFAULT_REGION: ap-northeast-1
 
     steps:
       - name: Checkout repository
@@ -27,39 +22,11 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.13.1
-
-      - name: Check AWS identity
-        run: aws sts get-caller-identity
-
-      # ✅ terraform init に明示的に backend-config を渡す
-      - name: Terraform Init with backend credentials
-        working-directory: ./terraform
-        run: |
-          terraform init \
-            -backend-config="bucket=tf-aws-study-terraform-tfstate" \
-            -backend-config="key=terraform.tfstate" \
-            -backend-config="region=ap-northeast-1" \
-            -backend-config="access_key=${AWS_ACCESS_KEY_ID}" \
-            -backend-config="secret_key=${AWS_SECRET_ACCESS_KEY}" \
-            -backend-config="encrypt=true" \
-            -reconfigure
-
-      - name: Get EC2 Public IP from Terraform output
-        working-directory: ./terraform
-        run: |
-          echo "EC2_IP=$(terraform output -raw ec2_public_ip)" >> $GITHUB_ENV
-
       - name: Add EC2 to known_hosts
-        run: ssh-keyscan -H $EC2_IP >> ~/.ssh/known_hosts
+        run: ssh-keyscan -H 18.182.65.67 >> ~/.ssh/known_hosts
 
-      - name: Create Ansible inventory dynamically
-        run: |
-          echo "[ec2]" > ansible/inventory.ini
-          echo "$EC2_IP ansible_user=ec2-user" >> ansible/inventory.ini
+      - name: Test SSH connection to EC2
+        run: ssh -i ~/.ssh/id_rsa ec2-user@18.182.65.67 "echo 'SSH connection successful!'"
 
-      - name: Run Ansible Playbook (Install Java 21)
+      - name: Run Ansible Playbook
         run: ansible-playbook -i ansible/inventory.ini ansible/playbook.yml
