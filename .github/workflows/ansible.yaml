@@ -1,11 +1,15 @@
 name: Ansible Deploy Java 21
 
 on:
-  workflow_dispatch:  # 手動実行トリガー
+  workflow_dispatch:
 
 jobs:
   ansible-run:
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./terraform  # Terraform用ディレクトリを指定
 
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -33,13 +37,10 @@ jobs:
           terraform_version: 1.13.1
 
       - name: Terraform Init
-        run: |
-          cd terraform
-          terraform init
+        run: terraform init
 
       - name: Get EC2 Public IP from Terraform output
         run: |
-          cd terraform
           echo "EC2_IP=$(terraform output -raw ec2_public_ip)" >> $GITHUB_ENV
 
       - name: Add EC2 to known_hosts
@@ -47,10 +48,12 @@ jobs:
           ssh-keyscan -H $EC2_IP >> ~/.ssh/known_hosts
 
       - name: Create Ansible inventory dynamically
+        working-directory: ./ansible  # ← ansibleのディレクトリに戻る
         run: |
-          echo "[ec2]" > ansible/inventory.ini
-          echo "$EC2_IP ansible_user=ec2-user" >> ansible/inventory.ini
+          echo "[ec2]" > inventory.ini
+          echo "$EC2_IP ansible_user=ec2-user" >> inventory.ini
 
       - name: Run Ansible Playbook (Install Java 21)
+        working-directory: ./ansible
         run: |
-          ansible-playbook -i ansible/inventory.ini ansible/playbook.yml
+          ansible-playbook -i inventory.ini playbook.yml
