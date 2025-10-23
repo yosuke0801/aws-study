@@ -1,0 +1,41 @@
+name: Ansible Deploy Java 21
+
+on:
+  workflow_dispatch:  # 手動実行トリガー
+
+jobs:
+  ansible-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Ansible
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Get EC2 Public IP from Terraform output
+        run: |
+          cd terraform
+          echo "EC2_IP=$(terraform output -raw ec2_public_ip)" >> $GITHUB_ENV
+
+      - name: Add EC2 to known_hosts
+        run: |
+          ssh-keyscan -H $EC2_IP >> ~/.ssh/known_hosts
+
+      - name: Create Ansible inventory dynamically
+        run: |
+          echo "[ec2]" > ansible/inventory.ini
+          echo "$EC2_IP ansible_user=ec2-user" >> ansible/inventory.ini
+
+      - name: Run Ansible Playbook (Install Java 21)
+        run: |
+          ansible-playbook -i ansible/inventory.ini ansible/playbook.yml
