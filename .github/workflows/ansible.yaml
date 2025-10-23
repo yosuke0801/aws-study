@@ -27,6 +27,14 @@ jobs:
         with:
           terraform_version: 1.13.1
 
+      # ✅ ここを追加して AWS 認証確認
+      - name: Check AWS identity
+        run: aws sts get-caller-identity
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ap-northeast-1
+
       - name: Terraform Init (with credentials)
         working-directory: ./terraform
         env:
