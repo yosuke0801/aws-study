@@ -1,13 +1,12 @@
 name: Ansible Deploy Java 21
 
 on:
-  workflow_dispatch:  # 手動実行
+  workflow_dispatch:
 
 jobs:
   ansible-run:
     runs-on: ubuntu-latest
 
-    # ✅ ここが重要：ジョブ全体にAWS認証を適用
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -36,9 +35,17 @@ jobs:
       - name: Check AWS identity
         run: aws sts get-caller-identity
 
-      - name: Terraform Init
+      # ✅ terraform init に -backend-config を追加
+      - name: Terraform Init (with backend credentials)
         working-directory: ./terraform
-        run: terraform init
+        run: |
+          terraform init \
+            -backend-config="region=ap-northeast-1" \
+            -backend-config="bucket=tf-aws-study-terraform-tfstate" \
+            -backend-config="key=terraform.tfstate" \
+            -backend-config="encrypt=true" \
+            -backend-config="access_key=${AWS_ACCESS_KEY_ID}" \
+            -backend-config="secret_key=${AWS_SECRET_ACCESS_KEY}"
 
       - name: Get EC2 Public IP from Terraform output
         working-directory: ./terraform
@@ -46,8 +53,7 @@ jobs:
           echo "EC2_IP=$(terraform output -raw ec2_public_ip)" >> $GITHUB_ENV
 
       - name: Add EC2 to known_hosts
-        run: |
-          ssh-keyscan -H $EC2_IP >> ~/.ssh/known_hosts
+        run: ssh-keyscan -H $EC2_IP >> ~/.ssh/known_hosts
 
       - name: Create Ansible inventory dynamically
         run: |
@@ -55,5 +61,4 @@ jobs:
           echo "$EC2_IP ansible_user=ec2-user" >> ansible/inventory.ini
 
       - name: Run Ansible Playbook (Install Java 21)
-        run: |
-          ansible-playbook -i ansible/inventory.ini ansible/playbook.yml
+        run: ansible-playbook -i ansible/inventory.ini ansible/playbook.yml
