@@ -55,3 +55,9 @@ output "waf_id" {
   description = "WAF WebACLのID"
   value       = module.waf.waf_id
 }
+
+# EC2のパブリックIP
+output "ec2_public_ip" {
+  description = "EC2のパブリックIP"
+  value       = module.ec2_instance.ec2_public_ip
+}
