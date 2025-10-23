@@ -34,6 +34,9 @@ jobs:
         with:
           terraform_version: 1.13.1
 
+      - name: Check AWS identity
+        run: aws sts get-caller-identity
+
       - name: Terraform Init
         run: terraform init
 
