@@ -35,17 +35,18 @@ jobs:
       - name: Check AWS identity
         run: aws sts get-caller-identity
 
-      # ✅ terraform init に -backend-config を追加
-      - name: Terraform Init (with backend credentials)
+      # ✅ terraform init に明示的に backend-config を渡す
+      - name: Terraform Init with backend credentials
         working-directory: ./terraform
         run: |
           terraform init \
-            -backend-config="region=ap-northeast-1" \
             -backend-config="bucket=tf-aws-study-terraform-tfstate" \
             -backend-config="key=terraform.tfstate" \
-            -backend-config="encrypt=true" \
+            -backend-config="region=ap-northeast-1" \
             -backend-config="access_key=${AWS_ACCESS_KEY_ID}" \
-            -backend-config="secret_key=${AWS_SECRET_ACCESS_KEY}"
+            -backend-config="secret_key=${AWS_SECRET_ACCESS_KEY}" \
+            -backend-config="encrypt=true" \
+            -reconfigure
 
       - name: Get EC2 Public IP from Terraform output
         working-directory: ./terraform
