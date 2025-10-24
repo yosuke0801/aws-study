@@ -1,0 +1,40 @@
+name: Ansible CD
+
+on:
+  workflow_run:
+    workflows: ["Ansible CI"]
+    types:
+      - completed
+
+jobs:
+  ansible-run:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Ansible
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Add EC2 to known_hosts
+        run: ssh-keyscan -H 18.182.65.67 >> ~/.ssh/known_hosts
+
+      - name: Wait for EC2 to be ready
+        run: sleep 30
+
+      - name: Test SSH connection to EC2
+        run: ssh -i ~/.ssh/id_rsa ec2-user@18.182.65.67 "echo 'SSH connection successful!'"
+
+      - name: Run Ansible Playbook
+        working-directory: ./ansible
+        run: ansible-playbook -i inventory.ini playbook.yaml

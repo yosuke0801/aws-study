@@ -1,10 +1,14 @@
-name: Install Java on EC2
+name: Ansible CI
 
 on:
-  workflow_dispatch:
+  workflow_run:
+    workflows: ["Terraform CD"]
+    types:
+      - completed
 
 jobs:
-  ansible-run:
+  ansible-dry-run:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -25,9 +29,12 @@ jobs:
       - name: Add EC2 to known_hosts
         run: ssh-keyscan -H 18.182.65.67 >> ~/.ssh/known_hosts
 
-      - name: Test SSH connection to EC2
-        run: ssh -i ~/.ssh/id_rsa ec2-user@18.182.65.67 "echo 'SSH connection successful!'"
+      - name: Wait for EC2 to be ready
+        run: sleep 30
 
-      - name: Run Ansible Playbook
+      - name: Test SSH connection
+        run: ssh -i ~/.ssh/id_rsa ec2-user@18.182.65.67 "echo 'SSH connection successful (Dry Run)!'"
+
+      - name: Ansible Dry Run (--check)
         working-directory: ./ansible
-        run: ansible-playbook -i inventory.ini playbook.yaml
+        run: ansible-playbook -i inventory.ini playbook.yaml --check
