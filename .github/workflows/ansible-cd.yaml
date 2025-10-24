@@ -5,6 +5,7 @@ on:
     workflows: ["Ansible CI"]
     types:
       - completed
+  workflow_dispatch:
 
 jobs:
   ansible-run:

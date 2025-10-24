@@ -5,6 +5,7 @@ on:
     workflows: ["Terraform CD"]
     types:
       - completed
+  workflow_dispatch:
 
 jobs:
   ansible-dry-run:
