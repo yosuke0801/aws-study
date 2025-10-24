@@ -3,9 +3,10 @@ name: Terraform CD
 on:
   push:
     branches:
-      - main   # main ブランチにマージされたときに実行
+      - main
     paths:
-      - 'terraform/**'   # terraform フォルダ内に変更があった場合のみ
+      - 'terraform/**'
+  workflow_dispatch:
 
 permissions:
   contents: read
