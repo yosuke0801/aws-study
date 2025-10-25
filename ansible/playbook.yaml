@@ -110,6 +110,8 @@
       environment:
         JAVA_HOME: /usr/lib/jvm/java-21-amazon-corretto
         PATH: "{{ ansible_env.PATH }}:/usr/lib/jvm/java-21-amazon-corretto/bin"
+      async: 1800   # 最大30分ビルドを許可（SSH切断対策）
+      poll: 15      # 15秒ごとに状態確認
 
     - name: Stop any existing Spring Boot app
       shell: |
@@ -124,6 +126,9 @@
       args:
         chdir: /home/ec2-user/app/demo/build/libs
       become_user: ec2-user
+      environment:
+        JAVA_HOME: /usr/lib/jvm/java-21-amazon-corretto
+        PATH: "{{ ansible_env.PATH }}:/usr/lib/jvm/java-21-amazon-corretto/bin"
 
     - name: Wait for application to start
       wait_for:
