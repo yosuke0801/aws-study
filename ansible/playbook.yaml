@@ -103,7 +103,8 @@
     - name: Build Spring Boot application with Gradle
       shell: |
         chmod +x gradlew
-        ./gradlew clean build -x test
+        ./gradlew clean build -x test --no-daemon \
+          -Dorg.gradle.java.home=/usr/lib/jvm/java-21-amazon-corretto
       args:
         chdir: /home/ec2-user/app/demo
       environment:
