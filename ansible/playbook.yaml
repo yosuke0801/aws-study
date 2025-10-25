@@ -1,16 +1,18 @@
 ---
-- name: Deploy Simple Spring Boot App on Amazon Linux 2023
+- name: Deploy Prebuilt Spring Boot Hello World on Amazon Linux 2023
   hosts: ec2
   become: true
 
   tasks:
-    # Java 21 インストール
-    - name: Install Amazon Corretto 21
+    # -------------------------------
+    # Java 21 (Amazon Corretto)
+    # -------------------------------
+    - name: Ensure Java 21 is installed
       dnf:
         name: java-21-amazon-corretto
         state: present
 
-    - name: Verify Java installation
+    - name: Verify Java version
       command: java -version
       register: java_version_output
       ignore_errors: true
@@ -19,83 +21,46 @@
       debug:
         var: java_version_output.stderr_lines
 
-    # Spring Boot プロジェクト取得
-    - name: Download Spring Boot starter project (JAR)
-      get_url:
-        url: "https://start.spring.io/starter.zip?type=gradle-project&language=java&bootVersion=3.4.1&groupId=com.example&artifactId=demo&name=demo&description=Demo+project+for+Spring+Boot&packageName=com.example.demo&packaging=jar&javaVersion=21&dependencies=web"
-        dest: /home/ec2-user/demo.zip
-
-    - name: Create demo directory
+    # -------------------------------
+    # Hello World アプリ配置・起動
+    # -------------------------------
+    - name: Create app directory
       file:
-        path: /home/ec2-user/demo
+        path: /home/ec2-user/app
         state: directory
         owner: ec2-user
         group: ec2-user
         mode: '0755'
 
-    - name: Unzip project
-      unarchive:
-        src: /home/ec2-user/demo.zip
-        dest: /home/ec2-user/demo
-        remote_src: true
+    - name: Download prebuilt Hello World JAR
+      get_url:
+        url: "https://github.com/spring-guides/gs-spring-boot/releases/download/v2.3.0.RELEASE/gs-spring-boot-0.1.0.jar"
+        dest: /home/ec2-user/app/demo.jar
+        mode: '0755'
+        owner: ec2-user
+        group: ec2-user
 
-    # HelloController.java 生成
-    - name: Create HelloController.java
-      copy:
-        dest: /home/ec2-user/demo/src/main/java/com/example/demo/HelloController.java
-        content: |
-          package com.example.demo;
+    - name: Stop existing app if running
+      shell: pgrep -f 'java -jar' | xargs -r kill
+      ignore_errors: true
 
-          import org.springframework.web.bind.annotation.GetMapping;
-          import org.springframework.web.bind.annotation.RestController;
-
-          @RestController
-          public class HelloController {
-              @GetMapping("/")
-              public String hello() {
-                  return "Hello World!";
-              }
-          }
-
-    # Gradle ビルド
-    - name: Build Spring Boot application
-      shell: |
-        chmod +x gradlew
-        # 標準出力をリアルタイムに流すために --console=plain を追加
-        ./gradlew assemble --no-daemon --console=plain \
-          -Dorg.gradle.java.home=/usr/lib/jvm/java-21-amazon-corretto
-      args:
-        chdir: /home/ec2-user/demo
-      async: 300       # 最大5分間バックグラウンド実行
-      poll: 15         # 15秒おきに進行を確認
-      environment:
-        JAVA_HOME: /usr/lib/jvm/java-21-amazon-corretto
-        PATH: "{{ ansible_env.PATH }}:/usr/lib/jvm/java-21-amazon-corretto/bin"
-
-
-    # アプリ起動
-    - name: Run Spring Boot application
-      shell: |
-        cd /home/ec2-user/demo/build/libs
-        JAR_FILE=$(ls *.jar | head -n 1)
-        nohup java -jar "$JAR_FILE" > /home/ec2-user/app.log 2>&1 &
+    - name: Start Spring Boot Hello World app
+      shell: nohup java -jar /home/ec2-user/app/demo.jar > /home/ec2-user/app/app.log 2>&1 &
       become_user: ec2-user
-      environment:
-        JAVA_HOME: /usr/lib/jvm/java-21-amazon-corretto
 
-    # 起動確認
     - name: Wait for app to start
       wait_for:
+        host: "{{ inventory_hostname }}"
         port: 8080
-        delay: 10
+        delay: 5
         timeout: 60
 
-    - name: Verify app response
+    - name: Verify Hello World response
       uri:
         url: "http://{{ inventory_hostname }}:8080"
         return_content: yes
       register: result
 
-    - name: Print response
+    - name: Print app response
       debug:
         msg: "{{ result.content }}"

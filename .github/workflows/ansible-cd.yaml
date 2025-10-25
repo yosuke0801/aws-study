@@ -2,7 +2,7 @@ name: Ansible CD
 
 on:
   workflow_run:
-    workflows: ["Ansible CI"]
+    workflows: ["Terraform CD"]  # Terraform完了時に自動実行
     types:
       - completed
   workflow_dispatch:
@@ -18,8 +18,8 @@ jobs:
 
       - name: Install Ansible
         run: |
-          sudo apt update -y
-          sudo apt install -y ansible sshpass
+          sudo apt update
+          sudo apt install -y ansible
 
       - name: Setup SSH key
         run: |
@@ -30,13 +30,9 @@ jobs:
       - name: Add EC2 to known_hosts
         run: ssh-keyscan -H 18.182.65.67 >> ~/.ssh/known_hosts
 
-      - name: Wait for EC2 to be ready
+      - name: Wait for EC2 startup
         run: sleep 30
-
-      - name: Test SSH connection to EC2
-        run: ssh -i ~/.ssh/id_rsa ec2-user@18.182.65.67 "echo '✅ SSH connection successful!'"
 
       - name: Run Ansible Playbook
         working-directory: ./ansible
-        run: |
-          ansible-playbook -i inventory.ini playbook.yaml -vvv --timeout=1800
+        run: ansible-playbook -i inventory.ini playbook.yaml
