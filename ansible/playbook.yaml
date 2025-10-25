@@ -44,6 +44,14 @@
         group: ec2-user
         mode: '0755'
 
+    - name: Create demo subdirectory
+      file:
+        path: /home/ec2-user/app/demo
+        state: directory
+        owner: ec2-user
+        group: ec2-user
+        mode: '0755'
+
     - name: Download Spring Boot project (Gradle, WAR)
       get_url:
         url: "https://start.spring.io/starter.zip?type=gradle-project&language=java&bootVersion=3.4.1&groupId=com.example&artifactId=demo&name=demo&description=Demo+project+for+Spring+Boot&packageName=com.example.demo&packaging=war&javaVersion=21&dependencies=web"
@@ -61,6 +69,14 @@
     # -------------------------------
     # HelloController.java 自動生成
     # -------------------------------
+    - name: Ensure source directory exists
+      file:
+        path: /home/ec2-user/app/demo/src/main/java/com/example/demo
+        state: directory
+        owner: ec2-user
+        group: ec2-user
+        mode: '0755'
+
     - name: Create HelloController.java
       copy:
         dest: /home/ec2-user/app/demo/src/main/java/com/example/demo/HelloController.java
