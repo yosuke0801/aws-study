@@ -1,13 +1,17 @@
 ---
-- name: Install Java 21 on Amazon Linux 2023
-  hosts: all
+- name: Install Java 21 and Deploy Spring Boot App on Amazon Linux 2023
+  hosts: ec2
   become: true
 
   tasks:
-    - name: Update packages
+    # -------------------------------
+    # Java 21 のインストール
+    # -------------------------------
+    - name: Update all packages (慎重に実施)
       dnf:
         name: "*"
         state: latest
+      notify: Reboot if kernel updated
 
     - name: Install Amazon Corretto 21 (Java 21)
       dnf:
@@ -22,3 +26,104 @@
     - name: Show Java version output
       debug:
         var: java_version_output.stderr_lines
+
+    # -------------------------------
+    # Spring Boot アプリ自動デプロイ
+    # -------------------------------
+    - name: Install required packages
+      dnf:
+        name:
+          - curl
+          - unzip
+        state: present
+
+    - name: Create app directory
+      file:
+        path: /home/ec2-user/app
+        state: directory
+        owner: ec2-user
+        group: ec2-user
+        mode: '0755'
+
+    - name: Download Spring Boot project (Gradle, WAR)
+      get_url:
+        url: "https://start.spring.io/starter.zip?type=gradle-project&language=java&bootVersion=3.4.1&groupId=com.example&artifactId=demo&name=demo&description=Demo+project+for+Spring+Boot&packageName=com.example.demo&packaging=war&javaVersion=21&dependencies=web"
+        dest: /home/ec2-user/app/demo.zip
+        mode: '0644'
+
+    - name: Unzip Spring Boot project
+      unarchive:
+        src: /home/ec2-user/app/demo.zip
+        dest: /home/ec2-user/app/
+        remote_src: true
+        owner: ec2-user
+        group: ec2-user
+
+    # -------------------------------
+    # HelloController.java 自動生成
+    # -------------------------------
+    - name: Create HelloController.java
+      copy:
+        dest: /home/ec2-user/app/demo/src/main/java/com/example/demo/HelloController.java
+        owner: ec2-user
+        group: ec2-user
+        mode: '0644'
+        content: |
+          package com.example.demo;
+
+          import org.springframework.web.bind.annotation.GetMapping;
+          import org.springframework.web.bind.annotation.RestController;
+
+          @RestController
+          public class HelloController {
+              @GetMapping("/")
+              public String hello() {
+                  return "Hello World!";
+              }
+          }
+
+    # -------------------------------
+    # Gradle ビルドとアプリ起動
+    # -------------------------------
+    - name: Build Spring Boot application with Gradle
+      shell: |
+        chmod +x gradlew
+        ./gradlew clean build
+      args:
+        chdir: /home/ec2-user/app/demo
+      environment:
+        JAVA_HOME: /usr/lib/jvm/java-21-amazon-corretto
+
+    - name: Stop any existing Spring Boot app
+      shell: |
+        pgrep -f 'java -jar' | xargs -r kill
+      ignore_errors: true
+
+    - name: Run Spring Boot application (as ec2-user)
+      shell: |
+        nohup java -jar /home/ec2-user/app/demo/build/libs/demo-0.0.1-SNAPSHOT.war > /home/ec2-user/app/app.log 2>&1 &
+      args:
+        chdir: /home/ec2-user/app/demo
+      become_user: ec2-user
+
+    - name: Wait for application to start
+      wait_for:
+        host: "{{ inventory_hostname }}"
+        port: 8080
+        delay: 10
+        timeout: 60
+
+    - name: Verify Spring Boot app is running
+      uri:
+        url: "http://{{ inventory_hostname }}:8080"
+        return_content: yes
+      register: result
+
+    - name: Print app response
+      debug:
+        msg: "{{ result.content }}"
+
+  handlers:
+    - name: Reboot if kernel updated
+      reboot:
+        msg: "Rebooting after kernel update"
