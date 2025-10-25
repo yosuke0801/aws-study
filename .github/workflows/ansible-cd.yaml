@@ -2,7 +2,7 @@ name: Ansible CD
 
 on:
   workflow_run:
-    workflows: ["Terraform CD"]  # Terraform完了時に自動実行
+    workflows: ["Terraform CD"]
     types:
       - completed
   workflow_dispatch:
@@ -18,7 +18,7 @@ jobs:
 
       - name: Install Ansible
         run: |
-          sudo apt update
+          sudo apt update -y
           sudo apt install -y ansible
 
       - name: Setup SSH key
