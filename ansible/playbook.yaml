@@ -33,7 +33,6 @@
     - name: Install required packages
       dnf:
         name:
-          - curl
           - unzip
         state: present
 
