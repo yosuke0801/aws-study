@@ -18,8 +18,8 @@ jobs:
 
       - name: Install Ansible
         run: |
-          sudo apt update
-          sudo apt install -y ansible
+          sudo apt update -y
+          sudo apt install -y ansible sshpass
 
       - name: Setup SSH key
         run: |
@@ -34,8 +34,9 @@ jobs:
         run: sleep 30
 
       - name: Test SSH connection to EC2
-        run: ssh -i ~/.ssh/id_rsa ec2-user@18.182.65.67 "echo 'SSH connection successful!'"
+        run: ssh -i ~/.ssh/id_rsa ec2-user@18.182.65.67 "echo '✅ SSH connection successful!'"
 
       - name: Run Ansible Playbook
         working-directory: ./ansible
-        run: ansible-playbook -i inventory.ini playbook.yaml
+        run: |
+          ansible-playbook -i inventory.ini playbook.yaml -vvv --timeout=1800

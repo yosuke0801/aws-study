@@ -1,19 +1,11 @@
 ---
-- name: Install Java 21 and Deploy Spring Boot App on Amazon Linux 2023
+- name: Deploy Simple Spring Boot App on Amazon Linux 2023
   hosts: ec2
   become: true
 
   tasks:
-    # -------------------------------
-    # Java 21 のインストール
-    # -------------------------------
-    - name: Update all packages (慎重に実施)
-      dnf:
-        name: "*"
-        state: latest
-      notify: Reboot if kernel updated
-
-    - name: Install Amazon Corretto 21 (Java 21)
+    # Java 21 インストール
+    - name: Install Amazon Corretto 21
       dnf:
         name: java-21-amazon-corretto
         state: present
@@ -23,66 +15,26 @@
       register: java_version_output
       ignore_errors: true
 
-    - name: Show Java version output
+    - name: Show Java version
       debug:
         var: java_version_output.stderr_lines
 
-    # -------------------------------
-    # Spring Boot アプリ自動デプロイ
-    # -------------------------------
-    - name: Install required packages
-      dnf:
-        name:
-          - unzip
-        state: present
-
-    - name: Create app directory
-      file:
-        path: /home/ec2-user/app
-        state: directory
-        owner: ec2-user
-        group: ec2-user
-        mode: '0755'
-
-    - name: Create demo subdirectory
-      file:
-        path: /home/ec2-user/app/demo
-        state: directory
-        owner: ec2-user
-        group: ec2-user
-        mode: '0755'
-
-    - name: Download Spring Boot project (Gradle, WAR)
+    # Spring Boot プロジェクト取得
+    - name: Download Spring Boot starter project (JAR)
       get_url:
-        url: "https://start.spring.io/starter.zip?type=gradle-project&language=java&bootVersion=3.4.1&groupId=com.example&artifactId=demo&name=demo&description=Demo+project+for+Spring+Boot&packageName=com.example.demo&packaging=war&javaVersion=21&dependencies=web"
-        dest: /home/ec2-user/app/demo.zip
-        mode: '0644'
+        url: "https://start.spring.io/starter.zip?type=gradle-project&language=java&bootVersion=3.4.1&groupId=com.example&artifactId=demo&name=demo&description=Demo+project+for+Spring+Boot&packageName=com.example.demo&packaging=jar&javaVersion=21&dependencies=web"
+        dest: /home/ec2-user/demo.zip
 
-    - name: Unzip Spring Boot project
+    - name: Unzip project
       unarchive:
-        src: /home/ec2-user/app/demo.zip
-        dest: /home/ec2-user/app/demo
+        src: /home/ec2-user/demo.zip
+        dest: /home/ec2-user/demo
         remote_src: true
-        owner: ec2-user
-        group: ec2-user
 
-    # -------------------------------
-    # HelloController.java 自動生成
-    # -------------------------------
-    - name: Ensure source directory exists
-      file:
-        path: /home/ec2-user/app/demo/src/main/java/com/example/demo
-        state: directory
-        owner: ec2-user
-        group: ec2-user
-        mode: '0755'
-
+    # HelloController.java 生成
     - name: Create HelloController.java
       copy:
-        dest: /home/ec2-user/app/demo/src/main/java/com/example/demo/HelloController.java
-        owner: ec2-user
-        group: ec2-user
-        mode: '0644'
+        dest: /home/ec2-user/demo/src/main/java/com/example/demo/HelloController.java
         content: |
           package com.example.demo;
 
@@ -97,55 +49,40 @@
               }
           }
 
-    # -------------------------------
-    # Gradle ビルドとアプリ起動
-    # -------------------------------
-    - name: Build Spring Boot application with Gradle
+    # Gradle ビルド
+    - name: Build Spring Boot application
       shell: |
         chmod +x gradlew
-        ./gradlew assemble --no-daemon \
-          -Dorg.gradle.java.home=/usr/lib/jvm/java-21-amazon-corretto
+        ./gradlew assemble --no-daemon
       args:
-        chdir: /home/ec2-user/app/demo
+        chdir: /home/ec2-user/demo
       environment:
         JAVA_HOME: /usr/lib/jvm/java-21-amazon-corretto
         PATH: "{{ ansible_env.PATH }}:/usr/lib/jvm/java-21-amazon-corretto/bin"
 
-    - name: Stop any existing Spring Boot app
+    # アプリ起動
+    - name: Run Spring Boot application
       shell: |
-        pgrep -f 'java -jar' | xargs -r kill
-      ignore_errors: true
-
-    - name: Run Spring Boot application (as ec2-user)
-      shell: |
-        cd /home/ec2-user/app/demo/build/libs
-        WAR_FILE=$(ls *.war | head -n 1)
-        nohup java -jar "$WAR_FILE" > /home/ec2-user/app/app.log 2>&1 &
-      args:
-        chdir: /home/ec2-user/app/demo/build/libs
+        cd /home/ec2-user/demo/build/libs
+        JAR_FILE=$(ls *.jar | head -n 1)
+        nohup java -jar "$JAR_FILE" > /home/ec2-user/app.log 2>&1 &
       become_user: ec2-user
       environment:
         JAVA_HOME: /usr/lib/jvm/java-21-amazon-corretto
-        PATH: "{{ ansible_env.PATH }}:/usr/lib/jvm/java-21-amazon-corretto/bin"
 
-    - name: Wait for application to start
+    # 起動確認
+    - name: Wait for app to start
       wait_for:
-        host: "{{ inventory_hostname }}"
         port: 8080
         delay: 10
         timeout: 60
 
-    - name: Verify Spring Boot app is running
+    - name: Verify app response
       uri:
         url: "http://{{ inventory_hostname }}:8080"
         return_content: yes
       register: result
 
-    - name: Print app response
+    - name: Print response
       debug:
         msg: "{{ result.content }}"
-
-  handlers:
-    - name: Reboot if kernel updated
-      reboot:
-        msg: "Rebooting after kernel update"
