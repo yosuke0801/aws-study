@@ -34,7 +34,7 @@
 
     - name: Download prebuilt Hello World JAR
       get_url:
-        url: "https://github.com/spring-guides/gs-spring-boot/releases/download/v2.3.0.RELEASE/gs-spring-boot-0.1.0.jar"
+        url: "https://repo1.maven.org/maven2/org/springframework/boot/spring-boot-samples/spring-boot-sample-simple/3.3.4/spring-boot-sample-simple-3.3.4.jar"
         dest: /home/ec2-user/app/demo.jar
         mode: '0755'
         owner: ec2-user
