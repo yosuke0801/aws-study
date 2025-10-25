@@ -53,7 +53,7 @@
     - name: Unzip Spring Boot project
       unarchive:
         src: /home/ec2-user/app/demo.zip
-        dest: /home/ec2-user/app/
+        dest: /home/ec2-user/app/demo
         remote_src: true
         owner: ec2-user
         group: ec2-user
