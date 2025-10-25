@@ -61,12 +61,17 @@
     - name: Build Spring Boot application
       shell: |
         chmod +x gradlew
-        ./gradlew assemble --no-daemon
+        # 標準出力をリアルタイムに流すために --console=plain を追加
+        ./gradlew assemble --no-daemon --console=plain \
+          -Dorg.gradle.java.home=/usr/lib/jvm/java-21-amazon-corretto
       args:
         chdir: /home/ec2-user/demo
+      async: 300       # 最大5分間バックグラウンド実行
+      poll: 15         # 15秒おきに進行を確認
       environment:
         JAVA_HOME: /usr/lib/jvm/java-21-amazon-corretto
         PATH: "{{ ansible_env.PATH }}:/usr/lib/jvm/java-21-amazon-corretto/bin"
+
 
     # アプリ起動
     - name: Run Spring Boot application
