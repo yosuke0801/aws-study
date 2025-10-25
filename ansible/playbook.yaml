@@ -103,11 +103,12 @@
     - name: Build Spring Boot application with Gradle
       shell: |
         chmod +x gradlew
-        ./gradlew clean build
+        ./gradlew clean build -x test
       args:
         chdir: /home/ec2-user/app/demo
       environment:
         JAVA_HOME: /usr/lib/jvm/java-21-amazon-corretto
+        PATH: "{{ ansible_env.PATH }}:/usr/lib/jvm/java-21-amazon-corretto/bin"
 
     - name: Stop any existing Spring Boot app
       shell: |
@@ -116,9 +117,11 @@
 
     - name: Run Spring Boot application (as ec2-user)
       shell: |
-        nohup java -jar /home/ec2-user/app/demo/build/libs/demo-0.0.1-SNAPSHOT.war > /home/ec2-user/app/app.log 2>&1 &
+        cd /home/ec2-user/app/demo/build/libs
+        WAR_FILE=$(ls *.war | head -n 1)
+        nohup java -jar "$WAR_FILE" > /home/ec2-user/app/app.log 2>&1 &
       args:
-        chdir: /home/ec2-user/app/demo
+        chdir: /home/ec2-user/app/demo/build/libs
       become_user: ec2-user
 
     - name: Wait for application to start
