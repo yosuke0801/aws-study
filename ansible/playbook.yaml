@@ -32,8 +32,7 @@
         mode: '0755'
 
     - name: Stop existing app if running
-      shell: pgrep -f 'java -jar' | xargs -r kill
-      ignore_errors: false
+      shell: pgrep -f 'java -jar' | xargs -r kill || true
 
     - name: Start Spring Boot Hello World app
       shell: nohup java -jar /home/ec2-user/app/demo.jar > /home/ec2-user/app/app.log 2>&1 &
