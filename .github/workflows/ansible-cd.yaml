@@ -38,7 +38,7 @@ jobs:
           echo "EC2_IP=$(terraform output -raw ec2_public_ip)" >> $GITHUB_ENV
 
       - name: Display EC2 IP
-        run: echo "✅ EC2 IP is ${{ env.EC2_IP }}"
+        run: echo "EC2 IP is ${{ env.EC2_IP }}"
 
       # Ansibleインストール
       - name: Install Ansible
@@ -71,4 +71,4 @@ jobs:
       # Ansible Playbook 実行
       - name: Run Ansible Playbook
         working-directory: ./ansible
-        run: ansible-playbook -i inventory.ini playbook.yaml
+        run: ansible-playbook -i inventory.ini playbook.yaml -u ec2-user
