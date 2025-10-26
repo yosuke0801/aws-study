@@ -39,8 +39,6 @@ resource "aws_security_group" "ec2_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  depends_on = [aws_instance.ec2]
-
   tags = {
     Name = "${var.ec2_name}-sg"
   }

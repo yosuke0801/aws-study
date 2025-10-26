@@ -41,5 +41,11 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
+      - name: Terraform Destroy (full rebuild)
+        run: terraform destroy -auto-approve || true
+
+      - name: Wait for AWS cleanup
+        run: sleep 30
+
       - name: Terraform Apply
         run: terraform apply -auto-approve
