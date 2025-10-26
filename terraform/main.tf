@@ -5,7 +5,7 @@ module "vpc" {
   vpc_cidr = "10.0.0.0/16"
 }
 
-# EC2 
+# EC2  
 module "ec2_instance" {
   source        = "./modules/ec2"
   ec2_name      = "${var.name_prefix}-ec2"
