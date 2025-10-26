@@ -34,7 +34,7 @@ jobs:
         id: get_ip
         run: |
           cd terraform
-          terraform init -backend=false  # backend設定を再利用（S3参照のため初期化）
+          terraform init -reconfigure
           echo "EC2_IP=$(terraform output -raw ec2_public_ip)" >> $GITHUB_ENV
 
       - name: Display EC2 IP
