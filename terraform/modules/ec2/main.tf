@@ -10,8 +10,6 @@ resource "aws_instance" "ec2" {
   tags = {
     Name = var.ec2_name
   }
-  
-  depends_on = [aws_security_group.ec2_sg]
 }
 
 # セキュリティグループ（EC2）
@@ -40,6 +38,8 @@ resource "aws_security_group" "ec2_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  depends_on = [aws_instance.ec2]
 
   tags = {
     Name = "${var.ec2_name}-sg"
