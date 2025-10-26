@@ -1,20 +1,13 @@
-name: Terraform CI
+name: Terraform Destroy
 
 on:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'terraform/**'
-  workflow_dispatch:
+  workflow_dispatch:  # 手動実行のみ（誤操作防止）
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
-  terraform:
-    name: terraform plan
+  terraform-destroy:
     runs-on: ubuntu-latest
 
     defaults:
@@ -37,17 +30,11 @@ jobs:
         with:
           terraform_version: 1.13.1
 
+      - name: Check AWS identity
+        run: aws sts get-caller-identity
+
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -reconfigure
 
-      - name: Terraform Format
-        run: terraform fmt -recursive
-
-      - name: Terraform Validate
-        run: terraform validate
-
-      - name: Terraform Test
-        run: terraform test ./tests/test-ci.tftest.hcl
-
-      - name: Terraform Plan
-        run: terraform plan -input=false
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve
