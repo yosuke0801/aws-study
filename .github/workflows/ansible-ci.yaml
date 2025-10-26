@@ -53,6 +53,13 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
+      # 動的インベントリ作成（最新IP使用）
+      - name: Create dynamic inventory
+        working-directory: ./ansible
+        run: |
+          echo "[ec2]" > inventory.ini
+          echo "${{ env.EC2_IP }}" >> inventory.ini
+
       # SSH known_hosts 登録
       - name: Add EC2 to known_hosts
         run: ssh-keyscan -H ${{ env.EC2_IP }} >> ~/.ssh/known_hosts
