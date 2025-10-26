@@ -5,10 +5,10 @@ module "vpc" {
   vpc_cidr = "10.0.0.0/16"
 }
 
-# EC2  
+# EC2
 module "ec2_instance" {
   source        = "./modules/ec2"
-  ec2_name      = "${var.name_prefix}-ec2"
+  ec2_name      = "${var.name_prefix}-ec2-test"
   ami_id        = "ami-07faa35bbd2230d90"
   instance_type = "t3.micro"
   subnet_id     = module.vpc.public_subnet_ids[0]  # AZ1a
