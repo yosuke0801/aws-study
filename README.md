@@ -1,4 +1,4 @@
-# 🌩️ AWSインフラ構築ポートフォリオ
+# AWSインフラ構築の学習記録
 
 このリポジトリでは、CloudFormation・Terraform・Ansible・GitHub Actionsを用いて  
 AWS上にインフラ環境を自動構築する一連の学習内容をまとめています。
@@ -6,7 +6,7 @@ AWS上にインフラ環境を自動構築する一連の学習内容をまと�
 ---
 
 ## 🖼️ ① インフラ構成図
-![インフラ構成図](./infrastructure-diagram.png)
+![インフラ構成図](./インフラ構成図.png)
 
 ### 📘 内容
 AWS上の基本構成（VPC / EC2 / RDS / ALB / WAF / CloudWatch）を設計。  
@@ -18,8 +18,8 @@ AWS上の基本構成（VPC / EC2 / RDS / ALB / WAF / CloudWatch）を設計。
 - CloudWatchへのメトリクス連携を図示して監視まで可視化  
 
 ### 📂 関連ファイル
-- `/infrastructure-diagram.drawio`
-- `/infrastructure-diagram.png`
+- `/インフラ構成図.drawio`
+- `/インフラ構成図.png`
 
 ---
 
