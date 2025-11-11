@@ -86,5 +86,5 @@ Terraformで生成されたEC2情報をもとにAnsibleが動作します。
 ### 📂 関連ファイル
 - [.github/workflows/ansible-ci.yaml](.github/workflows/ansible-ci.yaml)
 - [.github/workflows/ansible-cd.yaml](.github/workflows/ansible-cd.yaml)
-- [ansible/playbook.yml](./ansible/playbook.yml)
-- [app/demo.jar](./app/demo.jar)
+- [ansible/playbook.ymal](./ansible/playbook.ymal)
+- [ansible/app/demo.jar](./app/demo.jar)
