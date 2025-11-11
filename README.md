@@ -19,7 +19,7 @@ AWS上の基本構成（VPC / EC2 / RDS / ALB / WAF / CloudWatch）を設計。
 
 ### 📂 関連ファイル
 - (./インフラ構成図.drawio)
-- (./インフラ構成図.png)
+- [インフラ構成図.png](./インフラ構成図.png)
 
 ---
 
