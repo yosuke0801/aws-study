@@ -75,10 +75,9 @@ EC2へJava 21とSpring Bootアプリを自動デプロイ。
 Terraformで生成されたEC2情報をもとにAnsibleが動作します。
 
 ### 💡 工夫したこと
-- 動的IP対応（Terraform output → Ansible inventory自動生成）  
-- SSH known_hosts登録による安全な接続  
 - `wait_for`と`sleep`を使ってEC2起動待機を実装  
-- `inventory.ini`を動的生成し、最新のIPで接続  
+- `inventory.ini`でEC2の動的IPに対応  
+- - SSH known_hosts登録による安全な接続  
 - `nohup java -jar`でバックグラウンド実行＆ログ出力管理  
 
 ### 📂 関連ファイル
