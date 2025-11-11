@@ -1,0 +1,40 @@
+---
+- name: Deploy Prebuilt Spring Boot Hello World on Amazon Linux 2023
+  hosts: ec2
+  become: true
+
+  tasks:
+    # -------------------------------
+    # Java 21 (Amazon Corretto)
+    # -------------------------------
+    - name: Ensure Java 21 is installed
+      dnf:
+        name: java-21-amazon-corretto
+        state: present
+
+    # -------------------------------
+    # Hello World アプリ配置・起動
+    # -------------------------------
+    - name: Create app directory
+      file:
+        path: /home/ec2-user/app
+        state: directory
+        owner: ec2-user
+        group: ec2-user
+        mode: '0755'
+
+    - name: Upload prebuilt Hello World JAR from repository
+      copy:
+        src: app/demo.jar
+        dest: /home/ec2-user/app/demo.jar
+        owner: ec2-user
+        group: ec2-user
+        mode: '0755'
+
+    - name: Stop existing app if running
+      shell: pgrep -f 'java -jar' | xargs -r kill
+      failed_when: false
+
+    - name: Start Spring Boot Hello World app
+      shell: nohup java -jar /home/ec2-user/app/demo.jar > /home/ec2-user/app/app.log 2>&1 &
+      become_user: ec2-user
