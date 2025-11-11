@@ -69,8 +69,8 @@ Terraformを対象にCI（plan）→CD（apply）を自動化。
 
 | Workflow | トリガー | 主な内容 |
 |-----------|-----------|-----------|
-| Terraform CI | pull_request to main | init / fmt / validate / test / plan |
-| Terraform CD | push to main | apply による再構築 |
+| Terraform CI | プルリクエスト時 | init / fmt / validate / test / plan |
+| Terraform CD | マージ時（mainブランチへプッシュでも可能） | apply による構築 |
 
 
 ### 📂 関連ファイル
