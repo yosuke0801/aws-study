@@ -45,7 +45,6 @@ EC2・VPC・SecurityGroupなどをテンプレートで再現可能にしまし�
 TerraformでAWSリソースをIaC化し、S3バックエンドで状態管理を実装。  
 
 ### 💡 工夫したこと
-- **S3＋DynamoDB**でステート管理を実装  
 - **モジュール構成**による可読性と再利用性の確保  
 
 ### 📂 関連ファイル
@@ -56,13 +55,11 @@ TerraformでAWSリソースをIaC化し、S3バックエンドで状態管理を
 ## ④ GitHub Actionsを用いたCI/CD構築
 
 ### 📘 内容
-GitHub Actionsを使用し、TerraformとAnsibleのCI/CDを自動化。  
-mainブランチへのプッシュをトリガーに、環境構築〜デプロイが自動実行されます。
+GitHub Actionsを使用し、TerraformのCI/CDを自動化。  
+mainブランチへのプッシュをトリガーに、環境構築が自動実行されます。
 
 ### 💡 工夫したこと
 - `workflow_run`トリガーでTerraform CI → Terraform CD を連携  
-- 動的IP対応（Terraform output → Ansible inventory自動生成）  
-- SSH known_hosts登録による安全な接続  
 - 構築した環境の削除用に手動専用のdestroyファイルを作成
 
 ### 📂 関連ファイル
@@ -79,6 +76,8 @@ EC2へJava 21とSpring Bootアプリを自動デプロイ。
 Terraformで生成されたEC2情報をもとにAnsibleが動作します。
 
 ### 💡 工夫したこと
+- 動的IP対応（Terraform output → Ansible inventory自動生成）  
+- SSH known_hosts登録による安全な接続  
 - `wait_for`と`sleep`を使ってEC2起動待機を実装  
 - `inventory.ini`を動的生成し、最新のIPで接続  
 - `nohup java -jar`でバックグラウンド実行＆ログ出力管理  
