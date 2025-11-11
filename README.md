@@ -5,7 +5,7 @@ AWS上にインフラ環境を自動構築する一連の学習内容をまと�
 
 ---
 
-## 🖼️ ① インフラ構成図
+## ① インフラ構成図
 ![インフラ構成図](./インフラ構成図.png)
 
 ### 📘 内容
@@ -23,7 +23,7 @@ AWS上の基本構成（VPC / EC2 / RDS / ALB / WAF / CloudWatch）を設計。
 
 ---
 
-## 🏗️ ② CloudFormationによるインフラ環境のコード化
+## ② CloudFormationによるインフラ環境のコード化
 
 ### 📘 内容
 YAML形式でAWSリソースをコード化し、手動構築を自動化。  
@@ -35,11 +35,11 @@ EC2・VPC・SecurityGroupなどをテンプレートで再現可能にしまし�
 - IAMポリシーの最小権限化を意識  
 
 ### 📂 関連ファイル
-- `/CloudFormation.yml`
+- [CloudFormation.yaml](./CloudFormation.yaml)
 
 ---
 
-## 🌍 ③ Terraformによるインフラ環境のコード化
+## ③ Terraformによるインフラ環境のコード化
 
 ### 📘 内容
 TerraformでAWSリソースをIaC化し、S3バックエンドで状態管理を実装。  
@@ -49,32 +49,30 @@ TerraformでAWSリソースをIaC化し、S3バックエンドで状態管理を
 - **モジュール構成**による可読性と再利用性の確保  
 
 ### 📂 関連ファイル
-- `/terraform/`
+- [terraform/](./terraform/)
 
 ---
 
-## ⚙️ ④ GitHub Actionsを用いたCI/CD構築
+## ④ GitHub Actionsを用いたCI/CD構築
 
 ### 📘 内容
 GitHub Actionsを使用し、TerraformとAnsibleのCI/CDを自動化。  
 mainブランチへのプッシュをトリガーに、環境構築〜デプロイが自動実行されます。
 
 ### 💡 工夫したこと
-- `workflow_run`トリガーでTerraform CI → Terraform CD → Ansible CI → Ansible CDを連携  
+- `workflow_run`トリガーでTerraform CI → Terraform CD を連携  
 - 動的IP対応（Terraform output → Ansible inventory自動生成）  
 - SSH known_hosts登録による安全な接続  
 - 構築した環境の削除用に手動専用のdestroyファイルを作成
 
 ### 📂 関連ファイル
-- `.github/workflows/terraform-ci.yaml`
-- `.github/workflows/terraform-cd.yaml`
-- `.github/workflows/ansible-ci.yaml`
-- `.github/workflows/ansible-cd.yaml`
-- `.github/workflows/terraform-destroy.yaml`
+- [.github/workflows/terraform-ci.yaml](.github/workflows/terraform-ci.yaml)
+- [.github/workflows/terraform-cd.yaml](.github/workflows/terraform-cd.yaml)
+- [.github/workflows/terraform-destroy.yaml](.github/workflows/terraform-destroy.yaml)
 
 ---
 
-## 🧰 ⑤ Ansibleによる構成管理と自動デプロイ
+## ⑤ Ansibleによる構成管理と自動デプロイ
 
 ### 📘 内容
 EC2へJava 21とSpring Bootアプリを自動デプロイ。  
@@ -86,5 +84,7 @@ Terraformで生成されたEC2情報をもとにAnsibleが動作します。
 - `nohup java -jar`でバックグラウンド実行＆ログ出力管理  
 
 ### 📂 関連ファイル
-- `/ansible/playbook.yml`
-- `/app/demo.jar`
+- [.github/workflows/ansible-ci.yaml](.github/workflows/ansible-ci.yaml)
+- [.github/workflows/ansible-cd.yaml](.github/workflows/ansible-cd.yaml)
+- [ansible/playbook.yml](./ansible/playbook.yml)
+- [app/demo.jar](./app/demo.jar)
