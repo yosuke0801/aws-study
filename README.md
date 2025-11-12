@@ -10,7 +10,7 @@ AWS上にインフラ環境を自動構築する一連の学習内容をまと�
 
 ### 📘 内容
 AWS上の基本構成（VPC / EC2 / RDS / ALB / WAF / CloudWatch）を設計。  
-インターネット経由でアクセス可能なWebアプリケーション環境を構築しました。
+インターネット経由でアクセス可能なWebアプリケーション環境を構築しました。  
 
 ### 💡 工夫したこと
 - 最新のAWSアイコンを用いた構成図（draw.io）を使用  
@@ -26,7 +26,7 @@ AWS上の基本構成（VPC / EC2 / RDS / ALB / WAF / CloudWatch）を設計。
 ## ② CloudFormationによるインフラ環境のコード化
 
 ### 📘 内容
-AWSマネジメントコンソールで構築した環境をCloudFormationでコード化。
+AWSマネジメントコンソールで構築した環境をCloudFormationでコード化。  
 各リソースをテンプレート化し、再現性の高いインフラ環境構築を自動化。  
 
 ### 💡 工夫したこと
@@ -42,8 +42,8 @@ AWSマネジメントコンソールで構築した環境をCloudFormationでコ
 ## ③ Terraformによるインフラ環境のコード化（IaC）
 
 ### 📘 内容
-CloudFormationでの構築をもとに、Terraformでインフラ環境構築をコード化。
-各リソースをTerraformで定義し、コマンド操作によってインフラ環境構築を自動化。 
+CloudFormationでの構築をもとに、Terraformでインフラ環境構築をコード化。  
+各リソースをTerraformで定義し、コマンド操作によってインフラ環境構築を自動化。  
 
 ### 💡 工夫したこと
 - CloudFormationとの違いを意識しながら、モジュール構成でコードの再利用性を高めました。
@@ -60,8 +60,8 @@ CloudFormationでの構築をもとに、Terraformでインフラ環境構築を
 ## ④ GitHub ActionsによるTerraform CI/CD
 
 ### 📘 内容
-Terraformでコード化したインフラ構築をGitHub Actionsで自動化。
-Terraformの実行をワークフローとして定義し、プルリクエストやマージをトリガーにterraform planやapplyによりインフラ環境構築を自動化しました。
+Terraformでコード化したインフラ構築をGitHub Actionsで自動化。  
+Terraformの実行をワークフローとして定義し、プルリクエストやマージをトリガーにterraform planやapplyによりインフラ環境構築を自動化しました。  
 
 ### 💡 工夫したこと
 - ワークフローをCI（plan）とCD（apply）で分けて管理し、構成を整理。
@@ -90,9 +90,9 @@ Terraformの実行をワークフローとして定義し、プルリクエス�
 ## ⑤ Ansibleによる構成管理とアプリ自動デプロイ
 
 ### 📘 内容
-Ansibleを使用してEC2上の構成管理とアプリケーションの自動デプロイを実装。
-JavaのインストールからSpring Bootアプリの配置・起動までを一連の流れとして自動化。
-GitHub Actionsと連携し、Terraformによる環境構築完了後にAnsibleが自動で実行。
+Ansibleを使用してEC2上の構成管理とアプリケーションの自動デプロイを実装。  
+JavaのインストールからSpring Bootアプリの配置・起動までを一連の流れとして自動化。  
+GitHub Actionsと連携し、Terraformによる環境構築完了後にAnsibleが自動で実行。  
 
 ### 💡 工夫したこと
 - ワークフローをCI（ドライラン）とCD（実行）で分けて管理し、デプロイ前に構成チェックの実施。
