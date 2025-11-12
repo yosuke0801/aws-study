@@ -26,12 +26,13 @@ AWS上の基本構成（VPC / EC2 / RDS / ALB / WAF / CloudWatch）を設計。
 ## ② CloudFormationによるインフラ環境のコード化
 
 ### 📘 内容
-YAML形式でAWSリソースをコード化し、構築を自動化。  
-EC2・VPC・SecurityGroupなどをテンプレートで再現可能にしました。
+AWSマネジメントコンソールで構築した環境をCloudFormationでコード化。
+各リソースをテンプレート化し、再現性の高いインフラ環境構築を自動化。  
 
 ### 💡 工夫したこと
-- パラメータ化による再利用性の向上  
-- IAMポリシーの最小権限化を意識  
+- 手動構築でリソース間の依存関係を理解したうえで、CloudFormationにより再現性の高い構成へ変換。
+- パラメータ機能を活用し、環境ごとに設定値を柔軟に切り替えられるように設計。
+- コード化によって再現性と保守性の向上を体験し、Infrastructure as Codeの基本を学習。
 
 ### 📂 関連ファイル
 - [CloudFormation.yaml](./CloudFormation.yaml)
@@ -41,12 +42,15 @@ EC2・VPC・SecurityGroupなどをテンプレートで再現可能にしまし�
 ## ③ Terraformによるインフラ環境のコード化（IaC）
 
 ### 📘 内容
-TerraformでAWSリソースをIaC化し、S3バックエンドで状態管理を実装。 
-CLIからコマンドを実行してインフラを構築できるようにしました。 
+CloudFormationでの構築をもとに、Terraformでインフラ環境構築をコード化。
+各リソースをTerraformで定義し、コマンド操作によってインフラ環境構築を自動化。 
 
 ### 💡 工夫したこと
-- モジュール構成による可読性と再利用性の確保  
-- S3リモートバックエンドで状態を一元管理
+- CloudFormationとの違いを意識しながら、モジュール構成でコードの再利用性を高めました。
+- 変数や出力値を使い、設定や結果を整理して管理しやすくしました。
+- モジュール構成による
+- terraform fmt、validate、plan、applyの一連の操作で構築の流れを確認。
+- S3をバックエンドで設定し、状態状態管理ファイル（tfstate）の仕組みを理解しました。
 
 ### 📂 関連ファイル
 - [terraform/](./terraform/)
@@ -56,14 +60,17 @@ CLIからコマンドを実行してインフラを構築できるようにし�
 ## ④ GitHub ActionsによるTerraform CI/CD
 
 ### 📘 内容
-Terraformを対象にCI（plan）→CD（apply）を自動化。  
-プルリクエスト時に構文チェックやテストを行い、mainブランチへのマージでAWS環境構築が自動実行されます。
+Terraformでコード化したインフラ構築をGitHub Actionsで自動化。
+Terraformの実行をワークフローとして定義し、プルリクエストやマージをトリガーにterraform planやapplyによりインフラ環境構築を自動化しました。
 
 ### 💡 工夫したこと
-- pull_requestトリガーでCIを実行し、構成エラーを検出
-- pushトリガーでCDを起動し、環境を自動構築
-- terraform destroyにより環境構築の削除も可能  
-- workflow_dispatchにより手動実行も可能
+- ワークフローをCI（plan）とCD（apply）で分けて管理し、構成を整理。
+- pull_requestトリガーでCIを実行し、構成エラーを事前に検出。
+- pushトリガーでmainブランチへのマージ後、自動的にCDを実行してインフラを構築。
+- workflow_dispatchにより、手動での再実行にも対応。
+- terraform destroy専用のワークフローを別途作成し、手動で環境削除を実行できるように設計。
+- S3バックエンドを使用し、コード変更時にも再構築が正しく行われるように設計。
+- AWSアクセスキーなどの認証情報をGitHub Secretsで安全に管理。
 
 ### ⚙️ ワークフロー構成
 
@@ -83,14 +90,16 @@ Terraformを対象にCI（plan）→CD（apply）を自動化。
 ## ⑤ Ansibleによる構成管理とアプリ自動デプロイ
 
 ### 📘 内容
-Terraformで作成されたEC2へ、Ansibleを用いてJava 21とSpring Bootアプリを自動デプロイ。  
-GitHub ActionsでTerraformとAnsibleを組み合わせたパイプライン構成により
+Ansibleを使用してEC2上の構成管理とアプリケーションの自動デプロイを実装。
+JavaのインストールからSpring Bootアプリの配置・起動までを一連の流れとして自動化。
+GitHub Actionsと連携し、Terraformによる環境構築完了後にAnsibleが自動で実行。
 
 ### 💡 工夫したこと
-- Terraformの出力値（EC2の動的IP）を利用した動的検知
-- wait_forとsleepを使ってEC2起動待機を実装  
-- SSH known_hosts登録による安全な接続  
-- nohup java -jarでバックグラウンド実行＆ログ出力管理  
+- ワークフローをCI（ドライラン）とCD（実行）で分けて管理し、デプロイ前に構成チェックの実施。
+- Terraformの出力値からEC2パブリックIPを自動取得し、Ansibleのインベントリを動的生成。
+- Javaを自動インストールし、Spring Bootアプリ（JARファイル）をGitHubからEC2へ転送し、バックグラウンド起動。
+- workflow_dispatchにより、手動での再実行にも対応。
+- SSH鍵やAWSアクセスキーなどの認証情報をGitHub Secretsで安全に管理。
 
 ### ⚙️ ワークフロー構成
 
@@ -104,3 +113,4 @@ GitHub ActionsでTerraformとAnsibleを組み合わせたパイプライン構�
 - [.github/workflows/ansible-ci.yaml](.github/workflows/ansible-ci.yaml)
 - [.github/workflows/ansible-cd.yaml](.github/workflows/ansible-cd.yaml)
 - [ansible/playbook.yaml](./ansible/playbook.yaml)
+- [ansible/app/demo.jar](./ansible/app/demo.jar)
