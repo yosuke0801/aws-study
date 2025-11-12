@@ -32,14 +32,14 @@ AWSマネジメントコンソールで構築した環境をCloudFormationでコ
 ### 💡 工夫したこと
 - 手動構築でリソース間の依存関係を理解したうえで、CloudFormationにより再現性の高い構成へ変換。
 - パラメータ機能を活用し、環境ごとに設定値を柔軟に切り替えられるように設計。
-- コード化によって再現性と保守性の向上を体験し、Infrastructure as Codeの基本を学習。
+- コード化によって再現性と保守性の向上を体験し、Infrastructure as Code（IaC）の基本を学習。
 
 ### 📂 関連ファイル
 - [CloudFormation.yaml](./CloudFormation.yaml)
 
 ---
 
-## ③ Terraformによるインフラ環境のコード化（IaC）
+## ③ Terraformによるインフラ環境のコード化
 
 ### 📘 内容
 CloudFormationでの構築をもとに、Terraformでインフラ環境構築をコード化。  
